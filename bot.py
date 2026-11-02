@@ -79,7 +79,7 @@ def parse_matches(html: str) -> list[dict]:
 
     # 2. Карточки событий из HTML
     result = []
-      for item in soup.select("#tickets .match-item"):
+    for item in soup.select("#tickets .match-item"):
         names = [n.get_text(strip=True) for n in item.select(".match-command-name")]
         if not names:
             continue
