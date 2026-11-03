@@ -7,7 +7,7 @@ from pathlib import Path
 
 import httpx
 
-from bot import fetch_matches, format_match  # берём парсер из вашего bot.py
+from bot import fetch_matches, format_match  # берём парсер из bot.py
 
 TOKEN = os.environ["BOT_TOKEN"]
 CHAT_ID = os.environ["CHAT_ID"]
@@ -30,11 +30,11 @@ async def watch():
         for m in matches:
             prev = old.get(m["title"])
             if prev is None:
-                await send(" Новое событие на сайте:\n\n" + format_match(m))
+                await send("Новое событие на сайте:\n\n" + format_match(m))
             elif m["available"] and not prev:
-                await send(" ПОЯВИЛИСЬ БИЛЕТЫ!\n\n" + format_match(m))
+                await send("ПОЯВИЛИСЬ БИЛЕТЫ!\n\n" + format_match(m))
             elif prev and not m["available"]:
-                await send(" Билеты закончились:\n\n" + format_match(m))
+                await send("Билеты закончились:\n\n" + format_match(m))
     STATE.write_text(
         json.dumps({m["title"]: m["available"] for m in matches}, ensure_ascii=False, indent=1),
         "utf-8",
@@ -44,7 +44,7 @@ async def watch():
 async def report():
     avail = [m for m in await fetch_matches() if m["available"]]
     body = "\n\n".join(format_match(m) for m in avail) or "Сейчас нет событий с билетами в продаже."
-    await send(" Актуальные билеты:\n\n" + body)
+    await send("Актуальные билеты:\n\n" + body)
 
 
 if __name__ == "__main__":
