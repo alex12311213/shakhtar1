@@ -139,13 +139,13 @@ def days_left(date: datetime) -> str:
 
 
 def format_match(m: dict) -> str:
-    lines = [f"⚽ {m['title']}"]
+    lines = [f" {m['title']}"]
     if m["competition"]:
-        lines.append(f"🏆 {m['competition']}")
+        lines.append(f" {m['competition']}")
     if m["date"]:
-        lines.append(f"📅 {m['date']:%d.%m.%Y %H:%M} ({days_left(m['date'])})")
+        lines.append(f" {m['date']:%d.%m.%Y %H:%M} ({days_left(m['date'])})")
     if m["stadium"]:
-        lines.append(f"🏟 {m['stadium']}")
+        lines.append(f" {m['stadium']}")
     lines.append("🎟 🟢 Билеты в продаже" if m["available"] else "🎟 🔴 Нет в продаже / распродано")
     lines.append(f"🔗 {m['url']}")
     return "\n".join(lines)
@@ -168,9 +168,9 @@ async def build_report(only_available: bool = False) -> str:
 def main_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🎟 Актуальные билеты", callback_data="tickets")],
-            [InlineKeyboardButton(text="📅 Дни до матча", callback_data="days")],
-            [InlineKeyboardButton(text="🛒 Ссылки на продажу", callback_data="links")],
+            [InlineKeyboardButton(text=" Актуальные билеты", callback_data="tickets")],
+            [InlineKeyboardButton(text=" Дни до матча", callback_data="days")],
+            [InlineKeyboardButton(text=" Ссылки на продажу", callback_data="links")],
         ]
     )
 
@@ -180,29 +180,29 @@ async def do_tickets(msg: Message):
         text = await build_report()
     except Exception as e:
         log.exception("Ошибка /check")
-        text = f"⚠️ Не удалось получить данные с сайта: {e}"
+        text = f" Не удалось получить данные с сайта: {e}"
     await msg.answer(text)
 
 
 async def do_days(msg: Message):
     try:
         matches = [m for m in await fetch_matches() if m["date"]]
-        text = "\n".join(f"⚽ {m['title']}: {days_left(m['date'])}" for m in matches)
+        text = "\n".join(f" {m['title']}: {days_left(m['date'])}" for m in matches)
         text = text or "Матчей с датой не найдено."
     except Exception as e:
         log.exception("Ошибка /days")
-        text = f"⚠️ Не удалось получить данные с сайта: {e}"
+        text = f" Не удалось получить данные с сайта: {e}"
     await msg.answer(text)
 
 
 async def do_links(msg: Message):
     try:
         matches = await fetch_matches()
-        text = "\n".join(f"🛒 {m['title']}\n{m['url']}" for m in matches)
+        text = "\n".join(f" {m['title']}\n{m['url']}" for m in matches)
         text = text or "Ссылок не найдено."
     except Exception as e:
         log.exception("Ошибка /link")
-        text = f"⚠️ Не удалось получить данные с сайта: {e}"
+        text = f" Не удалось получить данные с сайта: {e}"
     await msg.answer(text)
 
 
@@ -247,10 +247,10 @@ async def cb_links(c: CallbackQuery):
 # ----------------------------- АВТОРАССЫЛКА И МОНИТОРИНГ -----------------------------
 async def scheduled_report():
     try:
-        text = "🕛 Актуальные билеты:\n\n" + await build_report(only_available=True)
+        text = " Актуальные билеты:\n\n" + await build_report(only_available=True)
     except Exception as e:
         log.exception("Ошибка авторассылки")
-        text = f"⚠️ Не удалось получить данные с сайта: {e}"
+        text = f" Не удалось получить данные с сайта: {e}"
     await bot.send_message(CHAT_ID, text)
 
 
@@ -267,11 +267,11 @@ async def watch():
         for title, m in new.items():
             old = last_state.get(title)
             if old is None:
-                await bot.send_message(CHAT_ID, "🆕 Новое событие на сайте:\n\n" + format_match(m))
+                await bot.send_message(CHAT_ID, " Новое событие на сайте:\n\n" + format_match(m))
             elif m["available"] and not old["available"]:
-                await bot.send_message(CHAT_ID, "🔔 ПОЯВИЛИСЬ БИЛЕТЫ!\n\n" + format_match(m))
+                await bot.send_message(CHAT_ID, " ПОЯВИЛИСЬ БИЛЕТЫ!\n\n" + format_match(m))
             elif old["available"] and not m["available"]:
-                await bot.send_message(CHAT_ID, "❌ Билеты закончились:\n\n" + format_match(m))
+                await bot.send_message(CHAT_ID, " Билеты закончились:\n\n" + format_match(m))
     last_state = new
 
 
